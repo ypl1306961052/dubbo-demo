@@ -1,0 +1,75 @@
+NameableFilter
+允许通过getName和setName方式给过滤器命名。如果没有给该过滤器命名，那么默认将会使用web.xml中给定的名称（FilterConfiger的filterName）
+该类可以理解为为过滤器命名用的，也没有实现Filter中的doFilter方法。
+总结：NameableFilter是用于给过滤器命名使用的。
+3、OncePerRequestFilter
+filter的基类（说白了，就是正真实现了Filter中的doFilter方法的类），它用来保证在每个servlet容器上，第个请求都只会被过滤一次，不会重复过滤。
+通过getAlreadyFilteredAttributeName()方法来鉴别请求是否已经被过滤过。默认的实现基于具体过滤的实例名称。
+接下来看看具体逻辑：
+1、 判断过滤器是否已经执行过，如果执行过，调用filterChain.doFilter(request, response)直接放行，不再重复执行该过滤器的处理逻辑，直接走下一个过滤器或者通过该过滤进入到实际请求方法中。
+2、 判断过滤器是否开启，该类有个成员变量eabled，默认为true（注释给的解释是大多数的过滤器都是希望开启的，所以默认值为true），过滤器为开启状态，如果该过滤器没有被开启中，也同上面的逻辑一样，直接走下一个过滤器或者通过该过滤进入到实际请求方法中。
+3、这里又分3步，
+1、  设置一个已经执行过滤器的属性名称在request中。
+2、  调用doFilterInternal方法，执行真正的过滤器处理逻辑。
+3、  这个过滤器处理完后，将过滤器的属性名称从request中移出。这样如果程序执行到第2步，过滤又被调用了，它将会走到第一个if中，直接略过这个过滤器的处理，这样就保证了，每个过滤器在处理一个请求的时候只会被执行一次。
+总结：OncePerRequestFilter提供了一个实际处理过滤业务的方法doFilterInternal，并且保证每个请求只会被该过滤器过滤一次。
+4、AdviceFilter
+这个过滤器，类似于开启了AOP环绕通知，提供了preHandle,postHandle和afterCompletion这三个方法。
+其过滤逻辑为：doFilterInternal方法。
+executeChain方法中的实现为：chain.doFilter(request, response);
+所以如果preHandle方法返回false，则说明过滤器不会执行chain.doFilter，意味着请求被拦截掉了，不会进入到用户请求的地址上去。如果为true，表示过滤器放行了过滤的逻辑通过。
+然后会执行postHandle方法（该类中的postHandle方法为空实现），
+最后会执行一个，这个方法用于对一些异常进行处理（目前也是空实现）。
+通过以上可以看出，过滤的逻辑代码实际上是在preHandle这个方法中处理的，这个方法的返回值true和false决定了请求放行和请求被拦截。
+总结：AdviceFilter提供了类似于AOP环绕通知式的编程方式，其处理拦截的逻辑是在preHandle方法中完成的。preHandle方法返回true和false代表了通过过滤，请求可以到达用户的请求地址和过滤器拦截掉了用户的请求。
+5、PathMatchingFilter
+这个过滤器会处理指定的请求路径，和对其它路径的请求放行。
+打个比方：如果配置如下拦截,/hello=authc，
+这就意味着，请用户请求/hello时，这时的authc过滤就会对这个请求拦截并进行过滤逻辑处理。如果一个用户请求是/world，则不会对此请求过滤。
+这里有2个处理逻辑，
+AccessControlFilter
+
+
+如果用户没有认证（即登录），那么这个过滤器就是控制访问资源和用户重定向到登录页面的过滤器的父类。当一个用户没有认证（即登录）时，可以通过saveRequestAndRedirectToLogin这个方法，重定向到登录页面。
+
+以上是该类的文档说明，实际还有一些其它的逻辑在里面，接着5、PathMatchingFilter的思路走，我们得看看onPreHandle中的实现。
+
+
+
+其中调用了二个方法的逻辑或，isAccessAllowed和onAccessDenied。
+
+
+
+
+
+isAccessAllowed如果请求允许正常处理，返回true。否则返回false由方法onAccessDenied进行处理请求。即isAccessAllowed返回true表示用户已登录过，false表示用户还未登录。
+
+
+
+onAccessDenied即登录验证在isAccessAllowed方法中被拒绝以后调用，其中参数mappedValue可以通过配置获取到，也可以为null。这个方法的委托方法isAccessAllowed(request, response)处理，只有2个参数，大多数被isAccessAllowed方法拒绝后的行为（即isAccessAllowed返回false）,再做处理时不需要mappedValue这个配置参数。
+
+
+
+
+
+总结：AccessControlFilter中的onPreHandle处理真正的拦截逻辑，isAccessAllowed方法验证用户是否登录，onAccessDenied处理用户没登录后的逻辑，在这个过滤器中并没有给出isAccessAllowed和onAccessDenied方法的实现，下一步得去子类中看，目前只能通过文档的注释去了解这些方法大概会执行什么样的操作。
+
+
+7、AuthenticationFilter
+
+
+需要对当前用户认证的过滤器的基类，这个类封装了一些检查用户是否在系统中已经验证过的逻辑，子类需要对未验证的请求执行特定的逻辑。
+
+AuthenticationFilter这个类的子类为AuthenticatingFilter，通过第6个过滤器可以知道，最后处理登录认验的实际上就是isAccessAllowed和onAccessDenied这二个方法。再根据文档的描述，这个类实现了isAccessAllowed的逻辑，而它的子类AuthenticatingFilter实现了onAccessDenied的逻辑。
+
+先看isAccessAllowed方法:
+
+
+
+先取出当前用户，然后再返回当前用户是否已认证。
+
+
+
+通过以上逻辑可以看到，如果用户已认证（即用户已登录），那么用户的请户的将会往后执行，不再进行过滤拦截，如果用户没有登录，那么将会执行后面onAccessDenied方法中的内容。而onAccessDenied是在其子类中实现的。
+
+总结：AuthenticationFilter实现了isAccessAllowed方法，如果用户已登录，那么过滤器将直接放行，如果用户没有登录，那么再由其子类中的onAccessDenied方法处理后续逻辑。

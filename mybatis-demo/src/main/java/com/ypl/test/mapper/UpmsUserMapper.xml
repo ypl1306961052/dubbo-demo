@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ypl.test.mapper.UpmsUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ypl.test.entity.UpmsUser">
+        <id column="user_id" property="userId" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="salt" property="salt" />
+        <result column="realname" property="realname" />
+        <result column="avatar" property="avatar" />
+        <result column="phone" property="phone" />
+        <result column="email" property="email" />
+        <result column="sex" property="sex" />
+        <result column="dept_id" property="deptId" />
+        <result column="locked" property="locked" />
+        <result column="ctime" property="ctime" />
+        <result column="tenant_id" property="tenantId" />
+        <result column="target_id" property="targetId" />
+        <result column="target_type" property="targetType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id, username, password, salt, realname, avatar, phone, email, sex, dept_id, locked, ctime, tenant_id, target_id, target_type
+    </sql>
+    <select id="queryRolesByUserId" resultType="com.ypl.test.entity.UpmsRole">
+
+    </select>
+
+</mapper>

@@ -1,0 +1,5 @@
+# Project exclude paths
+/mybatis-demo/target/
+/springbootconsumer/target/
+/springbootinface/target/
+/springbootprovider/target/

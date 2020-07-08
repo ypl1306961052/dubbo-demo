@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ypl.test.mapper.UpmsPermissionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ypl.test.entity.UpmsPermission">
+        <id column="permission_id" property="permissionId"/>
+        <result column="system_id" property="systemId"/>
+        <result column="pid" property="pid"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="permission_value" property="permissionValue"/>
+        <result column="uri" property="uri"/>
+        <result column="icon" property="icon"/>
+        <result column="status" property="status"/>
+        <result column="ctime" property="ctime"/>
+        <result column="orders" property="orders"/>
+        <result column="tenant_id" property="tenantId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        permission_id, system_id, pid, name, type, permission_value, uri, icon, status, ctime, orders, tenant_id
+    </sql>
+    <select id="queryPermissionByUserId" resultType="com.ypl.test.entity.UpmsPermission">
+    SELECT
+	up.*
+    FROM
+	upms_user_role uur
+	LEFT JOIN upms_role_permission urp ON uur.role_id = urp.role_id
+	LEFT JOIN upms_permission up ON up.permission_id = urp.permission_id
+    WHERE
+	uur.user_id = #{userId};
+    </select>
+
+</mapper>
