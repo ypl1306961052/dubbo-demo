@@ -3,3 +3,6 @@
 /springbootconsumer/target/
 /springbootinface/target/
 /springbootprovider/target/
+./**.sh
+a.txt
+*.iml
