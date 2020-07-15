@@ -15,5 +15,5 @@ import java.util.List;
  * @since 2020-07-08
  */
 public interface UpmsUserMapper extends BaseMapper<UpmsUser> {
-
+ List<UpmsUser> selectUsers();
 }

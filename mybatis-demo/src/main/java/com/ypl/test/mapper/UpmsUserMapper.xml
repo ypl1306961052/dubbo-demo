@@ -25,8 +25,9 @@
     <sql id="Base_Column_List">
         user_id, username, password, salt, realname, avatar, phone, email, sex, dept_id, locked, ctime, tenant_id, target_id, target_type
     </sql>
-    <select id="queryRolesByUserId" resultType="com.ypl.test.entity.UpmsRole">
 
+    <select id="selectUsers" resultType="com.ypl.test.entity.UpmsUser">
+        SELECT *
+        FROM upms_user
     </select>
-
 </mapper>

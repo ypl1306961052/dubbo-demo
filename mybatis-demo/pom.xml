@@ -17,6 +17,11 @@
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper</artifactId>
+            <version>5.1.11</version>
+        </dependency>
 
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -49,5 +54,15 @@
             <version>2.3.29</version>
         </dependency>
     </dependencies>
-
+<!--    坑:配置文件写到跟.java里面 需要加入这段配置-->
+   <build>
+       <resources>
+           <resource>
+               <directory>src/main/java</directory>
+               <includes>
+                   <include>**/*.xml</include>
+               </includes>
+           </resource>
+       </resources>
+   </build>
 </project>
