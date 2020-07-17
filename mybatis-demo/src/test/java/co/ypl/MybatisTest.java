@@ -5,12 +5,14 @@ package co.ypl;
 */
 
 
+import com.github.pagehelper.PageHelper;
 import com.ypl.test.common.util.MybatisUtil;
 import com.ypl.test.entity.UpmsUser;
 import com.ypl.test.mapper.UpmsUserMapper;
 import org.apache.ibatis.executor.result.DefaultResultHandler;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.*;
+import org.apache.tomcat.jni.User;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -34,8 +36,14 @@ public class MybatisTest {
 //        UpmsUserMapper upmsUserMapper = sqlSession.getMapper(UpmsUserMapper.class);
 //        List<UpmsUser> upmsUsers = upmsUserMapper.selectUsers();
 //        System.out.println(upmsUsers);
-        RowBounds rowBounds=new RowBounds(0,100);
-        List<UpmsUser> upmsUser = sqlSession.selectList("com.ypl.test.mapper.UpmsUserMapper.selectUsers",null);
-        System.out.println(upmsUser);
+        RowBounds rowBounds=new RowBounds(0,1);
+//        PageHelper.offsetPage(0,10);
+//        List<UpmsUser> upmsUser = sqlSession.selectList("com.ypl.test.mapper.UpmsUserMapper.selectUsers",null,rowBounds);
+        UpmsUserMapper mapper = sqlSession.getMapper(UpmsUserMapper.class);
+        List<UpmsUser> upmsUsers = mapper.selectUsers(rowBounds);
+//        System.out.println(upmsUser);
+        List<Object> objects = sqlSession.selectList("select * fom", "", User);
+
+        System.out.println(upmsUsers);
     }
 }

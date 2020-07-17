@@ -3,6 +3,7 @@ package com.ypl.test.mapper;
 import com.ypl.test.entity.UpmsRole;
 import com.ypl.test.entity.UpmsUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
 
@@ -15,5 +16,5 @@ import java.util.List;
  * @since 2020-07-08
  */
 public interface UpmsUserMapper extends BaseMapper<UpmsUser> {
- List<UpmsUser> selectUsers();
+ List<UpmsUser> selectUsers(RowBounds rowBounds);
 }
