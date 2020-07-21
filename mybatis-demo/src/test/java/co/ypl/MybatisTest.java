@@ -6,6 +6,7 @@ package co.ypl;
 
 
 import com.github.pagehelper.PageHelper;
+import com.mysql.cj.MysqlType;
 import com.ypl.test.common.util.MybatisUtil;
 import com.ypl.test.entity.UpmsUser;
 import com.ypl.test.mapper.UpmsUserMapper;
@@ -38,12 +39,11 @@ public class MybatisTest {
 //        System.out.println(upmsUsers);
         RowBounds rowBounds=new RowBounds(0,1);
 //        PageHelper.offsetPage(0,10);
-//        List<UpmsUser> upmsUser = sqlSession.selectList("com.ypl.test.mapper.UpmsUserMapper.selectUsers",null,rowBounds);
+        List<UpmsUser> upmsUser = sqlSession.selectList("com.ypl.test.mapper.UpmsUserMapper.selectUsers",null,rowBounds);
         UpmsUserMapper mapper = sqlSession.getMapper(UpmsUserMapper.class);
         List<UpmsUser> upmsUsers = mapper.selectUsers(rowBounds);
 //        System.out.println(upmsUser);
-        List<Object> objects = sqlSession.selectList("select * fom", "", User);
-
+//        List<Object> objects = sqlSession.selectList("select * fom", "", null);
         System.out.println(upmsUsers);
     }
 }

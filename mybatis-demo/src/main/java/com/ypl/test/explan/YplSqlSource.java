@@ -9,6 +9,7 @@ import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlSource;
+import org.apache.ibatis.session.Configuration;
 
 import java.util.List;
 
@@ -25,14 +26,16 @@ import java.util.List;
 public class YplSqlSource implements SqlSource {
     private String sql;
     private List<ParameterMapping> parameterMappings;
+    private Configuration configuration;
 
-    public YplSqlSource(String sql,List<ParameterMapping> parameterMappings) {
+    public YplSqlSource(String sql, List<ParameterMapping> parameterMappings, Configuration configuration) {
         this.sql = sql;
         this.parameterMappings=parameterMappings;
+        this.configuration=configuration;
     }
 
     @Override
     public BoundSql getBoundSql(Object arg) {
-        return new BoundSql(null,sql,parameterMappings,arg );
+        return new BoundSql(this.configuration,sql,parameterMappings,arg );
     }
 }

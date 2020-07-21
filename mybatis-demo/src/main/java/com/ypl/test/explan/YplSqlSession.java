@@ -6,6 +6,7 @@ package com.ypl.test.explan;
 
 
 import com.alibaba.druid.pool.DruidDataSource;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.executor.Executor;
@@ -18,8 +19,10 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
 import javax.sql.DataSource;
+import java.io.Closeable;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,45 +36,33 @@ import java.util.Map;
  */
 
 
-public class YplSqlSession implements SqlSession {
-    private Executor executor;
-    private  Configuration configuration;
+public class YplSqlSession implements SqlSession, Closeable {
+
+    private Executor executor = null;
+    private Configuration configuration;
 
     public YplSqlSession() {
-        DruidDataSource druidDataSource = new DruidDataSource();
-        druidDataSource.setUrl("jdbc:mysql://10.241.21.13:3306/riskmission?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false&allowMultiQueries=true&serverTimezone=GMT%2B8");
-        druidDataSource.setName("risk");
-        druidDataSource.setPassword("risk2020");
-        Environment environment=new Environment("dev", new JdbcTransactionFactory(),druidDataSource);
-        configuration=new Configuration(environment);
+
     }
 
     public YplSqlSession(Executor executor) {
         this.executor = executor;
+        DruidDataSource druidDataSource = new DruidDataSource();
+        druidDataSource.setUrl("jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false&allowMultiQueries=true&serverTimezone=GMT%2B8");
+//        druidDataSource.setName("root");
+        druidDataSource.setUsername("root");
+        druidDataSource.setPassword("ypl123456YPL");
+        Environment environment = new Environment("dev", new JdbcTransactionFactory(), druidDataSource);
+        configuration = new Configuration(environment);
     }
 
     public Executor getExecutor() {
         return executor;
     }
 
-    public void setExecutor(Executor executor) {
-        this.executor = executor;
-    }
 
     @Override
     public <T> T selectOne(String s) {
-        SqlSource sqlSource=new YplSqlSource(s,null);
-
-        MappedStatement.Builder builder1 = new MappedStatement.Builder(configuration, null, sqlSource, null);
-        MappedStatement statement = builder1.build();
-        try {
-            executor.query(statement, null, null, resultContext -> {
-            });
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-
         return null;
     }
 
@@ -82,7 +73,20 @@ public class YplSqlSession implements SqlSession {
 
     @Override
     public <E> List<E> selectList(String s) {
-        return null;
+        SqlSource sqlSource = new YplSqlSource(s, null, this.configuration);
+
+
+        MappedStatement.Builder builder1 = new MappedStatement.Builder(configuration, "org.apache.ibatis.logging.stdout.StdOutImpl", sqlSource, null);
+        MappedStatement statement = builder1.build();
+        try {
+            return executor.query(statement, null, null, resultContext -> {
+                System.out.println(resultContext.getResultObject());
+            });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<>();
     }
 
     @Override
