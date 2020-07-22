@@ -67,61 +67,61 @@ public class DefaultExecutor implements Executor {
 
 
         List<Map<String, Object>> data = new ArrayList<>();
-        resultSet.
-        while (resultSet.next()) {
-            Map<String, Object> map = new HashMap<>(resultSet.getMetaData().getColumnCount());
-            //拿到列表
-            for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-                int columnType = resultSet.getMetaData().getColumnType(i);
-                String columnName = resultSet.getMetaData().getColumnName(i);
-                //数字 int
-                if (columnType == MysqlType.INT.getJdbcType()
-                        || columnType == MysqlType.TINYINT.getJdbcType()
-                        || columnType == MysqlType.MEDIUMINT.getJdbcType()) {
-                    map.put(columnName, resultSet.getInt(i));
-                    //字符
-                } else if (columnType == MysqlType.VARCHAR.getJdbcType()
-                        || columnType == MysqlType.CHAR.getJdbcType()
-                        || columnType == MysqlType.TEXT.getJdbcType()
-                        || columnType == MysqlType.TINYTEXT.getJdbcType()
-                ) {
-                    map.put(columnName, resultSet.getString(i));
-                    //float
-                } else if (columnType == MysqlType.FLOAT.getJdbcType()) {
-                    map.put(columnName, resultSet.getFloat(i));
-                    //long
-                } else if (columnType == MysqlType.BIGINT.getJdbcType()) {
-                    map.put(columnName, resultSet.getLong(i));
-                    //double
-                } else if (columnType == MysqlType.DOUBLE.getJdbcType()) {
-                    map.put(columnName, resultSet.getDouble(i));
-                    //decimal
-                } else if (columnType == MysqlType.DECIMAL.getJdbcType()) {
-                    map.put(columnName, resultSet.getBigDecimal(i));
-
-                    //时间
-                } else if (columnType == MysqlType.DATE.getJdbcType()
-
-                        || columnType == MysqlType.DATETIME.getJdbcType()) {
-                    map.put(columnName, resultSet.getDate(i));
-                } else if (columnType == MysqlType.TIME.getJdbcType()
-                        || columnType == MysqlType.YEAR.getJdbcType()) {
-                    map.put(columnName, resultSet.getTime(i));
-                } else if (columnType == MysqlType.TIMESTAMP.getJdbcType()) {
-                    map.put(columnName, resultSet.getTimestamp(i));
-                }
-                //blob
-                else if (columnType == MysqlType.BLOB.getJdbcType()
-                        || columnType == MysqlType.MEDIUMBLOB.getJdbcType()
-                        || columnType == MysqlType.LONGBLOB.getJdbcType()
-                ) {
-                    map.put(columnName, resultSet.getBlob(i));
-                }
-
-
-            }
-            data.add(map);
-        }
+//        resultSet.
+//        while (resultSet.next()) {
+//            Map<String, Object> map = new HashMap<>(resultSet.getMetaData().getColumnCount());
+//            //拿到列表
+//            for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
+//                int columnType = resultSet.getMetaData().getColumnType(i);
+//                String columnName = resultSet.getMetaData().getColumnName(i);
+//                //数字 int
+//                if (columnType == MysqlType.INT.getJdbcType()
+//                        || columnType == MysqlType.TINYINT.getJdbcType()
+//                        || columnType == MysqlType.MEDIUMINT.getJdbcType()) {
+//                    map.put(columnName, resultSet.getInt(i));
+//                    //字符
+//                } else if (columnType == MysqlType.VARCHAR.getJdbcType()
+//                        || columnType == MysqlType.CHAR.getJdbcType()
+//                        || columnType == MysqlType.TEXT.getJdbcType()
+//                        || columnType == MysqlType.TINYTEXT.getJdbcType()
+//                ) {
+//                    map.put(columnName, resultSet.getString(i));
+//                    //float
+//                } else if (columnType == MysqlType.FLOAT.getJdbcType()) {
+//                    map.put(columnName, resultSet.getFloat(i));
+//                    //long
+//                } else if (columnType == MysqlType.BIGINT.getJdbcType()) {
+//                    map.put(columnName, resultSet.getLong(i));
+//                    //double
+//                } else if (columnType == MysqlType.DOUBLE.getJdbcType()) {
+//                    map.put(columnName, resultSet.getDouble(i));
+//                    //decimal
+//                } else if (columnType == MysqlType.DECIMAL.getJdbcType()) {
+//                    map.put(columnName, resultSet.getBigDecimal(i));
+//
+//                    //时间
+//                } else if (columnType == MysqlType.DATE.getJdbcType()
+//
+//                        || columnType == MysqlType.DATETIME.getJdbcType()) {
+//                    map.put(columnName, resultSet.getDate(i));
+//                } else if (columnType == MysqlType.TIME.getJdbcType()
+//                        || columnType == MysqlType.YEAR.getJdbcType()) {
+//                    map.put(columnName, resultSet.getTime(i));
+//                } else if (columnType == MysqlType.TIMESTAMP.getJdbcType()) {
+//                    map.put(columnName, resultSet.getTimestamp(i));
+//                }
+//                //blob
+//                else if (columnType == MysqlType.BLOB.getJdbcType()
+//                        || columnType == MysqlType.MEDIUMBLOB.getJdbcType()
+//                        || columnType == MysqlType.LONGBLOB.getJdbcType()
+//                ) {
+//                    map.put(columnName, resultSet.getBlob(i));
+//                }
+//
+//
+//            }
+//            data.add(map);
+//        }
         return (List<E>) data;
 
     }
