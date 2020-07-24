@@ -22,7 +22,8 @@ import java.util.concurrent.CountDownLatch;
 
 public class ZkApplication {
     public static void main(String[] args) throws KeeperException, InterruptedException {
-        getChildren();
+//        getChildren();
+        createMode();
         new CountDownLatch(1).await();
     }
 
@@ -34,7 +35,7 @@ public class ZkApplication {
         System.out.println("获取超时时间："+zooKeeper.getSessionTimeout());
     }
 
-    public void createMode() throws KeeperException, InterruptedException {
+    public static void createMode() throws KeeperException, InterruptedException {
         /***
          * createMode：节点类型：
          *    EPHEMERAL 临时节点
@@ -43,15 +44,22 @@ public class ZkApplication {
          *    PERSISTENT_SEQUENTIAL 持久顺序节点
          */
         ZooKeeper zooKeeper = ZookeeperUtil.createZooKeeper();
-        zooKeeper.create("/test02",
+        zooKeeper.create("/test02/01",
                 "杨沛霖".getBytes(),
                 ZooDefs.Ids.OPEN_ACL_UNSAFE,
                 CreateMode.PERSISTENT, new AsyncCallback.StringCallback() {
                     @Override
-                    public void processResult(int i, String s, Object o, String s1) {
-                        System.out.println(i);
+                    public void processResult(int rc, String path, Object ctx, String name) {
+                        System.out.println("rc:"+rc+",path:"+path+",ctx:"+ctx+"name,"+name);
                     }
                 },0);
+        zooKeeper.create("/test02/01/001","eee".getBytes(),ZooDefs.Ids.OPEN_ACL_UNSAFE,CreateMode.PERSISTENT,new AsyncCallback.StringCallback(){
+            @Override
+            public void processResult(int rc, String path, Object ctx, String name) {
+
+            }
+        },"ypl");
+//        zooKeeper.delete("/test02/01",-1);
     }
 
 }

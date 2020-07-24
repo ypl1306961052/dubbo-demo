@@ -35,11 +35,28 @@ public class ZookeeperUtil {
         return zk;
 
     }
+    public static  ZooKeeper createZooKeeper(Watcher watcher){
+        ZooKeeper zk=null;
+        try {
+            zk=new ZooKeeper("127.0.0.1:2181",10000,watcher);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return zk;
+
+    }
     static class CustomWatcher implements Watcher{
 
         @Override
         public void process(WatchedEvent watchedEvent) {
             System.out.println(watchedEvent.getState());
+            if(watchedEvent.getState()==Event.KeeperState.SyncConnected){
+                System.out.println("链接成功");
+            }else if(watchedEvent.getType()==Event.EventType.NodeChildrenChanged){
+                System.out.println("子节点发生改变");
+                System.out.println(watchedEvent.getPath());
+            }
         }
+
     }
 }
