@@ -5,6 +5,9 @@ package com.ypl.controller;
 */
 
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 /**
  * @author wxt.yangp
  * @version V1.0
@@ -14,6 +17,11 @@ package com.ypl.controller;
  * @date 2020/7/9 9:55
  */
 
-
+@RestController
 public class SysController {
+    @GetMapping("/hello")
+    public String hello(){
+        return "欢迎来到 spring security";
+
+    }
 }
