@@ -8,6 +8,7 @@ package com.ypl.zk;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
+import org.apache.zookeeper.data.Stat;
 
 import java.security.acl.Acl;
 import java.util.ArrayList;
@@ -25,10 +26,71 @@ import java.util.concurrent.CountDownLatch;
 
 
 public class ZkApplication {
+    public static final String path = "/test08";
+
     public static void main(String[] args) throws KeeperException, InterruptedException {
 //        getChildren();
-        createMode();
+//        createMode();
+//        testListen();
+        ZooKeeper zooKeeper = ZookeeperUtil.createZooKeeper();
+        String path="/p";
+        zooKeeper.create(path,"0".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE,CreateMode.PERSISTENT);
+        zooKeeper.create(path,"0".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE,CreateMode.PERSISTENT);
         new CountDownLatch(1).await();
+    }
+
+    public static void testListen() {
+
+
+        ZooKeeper zooKeeper = ZookeeperUtil.createZooKeeper();
+        Watcher watcher = new Watcher() {
+            @Override
+            public void process(WatchedEvent watchedEvent) {
+                try {
+                    if (watchedEvent.getType() == Watcher.Event.EventType.NodeCreated) {
+                        System.out.println("节点创建了");
+                        Stat stat = new Stat();
+                        byte[] data = zooKeeper.getData(path, false, stat);
+                        System.out.println("节点数据为:" + new String(data));
+                       ZookeeperUtil.print(stat);
+                        ZookeeperUtil.registerZkListen(zooKeeper, path, this);
+                    } else if (watchedEvent.getType() == Watcher.Event.EventType.NodeDeleted) {
+                        System.out.println("节点删除了");
+                        ZookeeperUtil.registerZkListen(zooKeeper, path, this);
+                    } else if (watchedEvent.getType() == Event.EventType.NodeDataChanged) {
+                        System.out.println("数据发生改变");
+                        Stat stat = new Stat();
+                        byte[] data = zooKeeper.getData(path, false, stat);
+                        System.out.println("节点数据为:" + new String(data));
+                       ZookeeperUtil.print(stat);
+
+                        ZookeeperUtil.registerZkListen(zooKeeper, path, this);
+                    } else if (watchedEvent.getType() == Event.EventType.NodeChildrenChanged) {
+                        System.out.println("子节点发生改变");
+                        Stat stat = new Stat();
+                        byte[] data = zooKeeper.getData(path, false, stat);
+                        System.out.println("节点数据为:" + new String(data));
+                       ZookeeperUtil.print(stat);
+                        List<String> children = zooKeeper.getChildren(path, false);
+                        System.out.println("子节点数据为:" + children);
+                        ZookeeperUtil.registerZkListen(zooKeeper, path, this);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (KeeperException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        try {
+            ZookeeperUtil.registerZkListen(zooKeeper, path, watcher);
+            System.out.println(path+"的监听创建了");
+        } catch (KeeperException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private static void getChildren() throws KeeperException, InterruptedException {
@@ -51,7 +113,7 @@ public class ZkApplication {
         String path = "/07";
 
         zhuce(zooKeeper, path);
-        zooKeeper.removeAllWatches(path, Watcher.WatcherType.Any,false);
+        zooKeeper.removeAllWatches(path, Watcher.WatcherType.Any, false);
         zooKeeper.create(path,
                 "000000".getBytes(),
                 ZooDefs.Ids.OPEN_ACL_UNSAFE,
@@ -61,20 +123,20 @@ public class ZkApplication {
                         System.out.println("rc:" + rc + ",path:" + path + ",ctx:" + ctx + "name," + name);
                     }
                 }, 0);
-        zooKeeper.setData(path,"1111111".getBytes(),-1);
-        List<ACL> acls=new ArrayList<>();
-        Id id=new Id("world","anyone");
-        ACL acl=new ACL(1,id);
+        zooKeeper.setData(path, "1111111".getBytes(), -1);
+        List<ACL> acls = new ArrayList<>();
+        Id id = new Id("world", "anyone");
+        ACL acl = new ACL(1, id);
         acls.add(acl);
         String s = zooKeeper.create(path + "/01", "3333333".getBytes(), acls, CreateMode.PERSISTENT);
-        System.out.println("s::"+s);
+        System.out.println("s::" + s);
         List<String> children = zooKeeper.getChildren(path, true);
         System.out.println(children);
         for (int i = 0; i < children.size(); i++) {
 
-            zooKeeper.delete(path+"/"+children.get(i),-1);
+            zooKeeper.delete(path + "/" + children.get(i), -1);
         }
-        zooKeeper.delete(path,-1);
+        zooKeeper.delete(path, -1);
 
 
     }
@@ -116,5 +178,6 @@ public class ZkApplication {
             }
         });
     }
+
 
 }
