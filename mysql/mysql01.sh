@@ -57,7 +57,8 @@ alias mysql=/usr/local/mysql/bin/mysql
 
 
 #mysql 数据库 默认 只能locahost链接 需要修改一下配置
-#mysql -u root -p
+#mysql -u root -p  mysql -u root -h [ip] -p
 # use mysql;
 #update user set host='%' where user='root';
 # flush privileges;
+#quit;

@@ -1,4 +1,6 @@
 
+
+rpm -qa|grep vsftpd
 #安装ftp
 yum install vsftpd
 # 开启服务号
