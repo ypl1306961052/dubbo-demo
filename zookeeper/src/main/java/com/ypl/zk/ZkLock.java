@@ -10,14 +10,11 @@ import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author wxt.yangp
@@ -35,11 +32,11 @@ public class ZkLock implements Lock {
     private String lockPath;
     private byte[] nodeData = new byte[0];
     /**
-      当前子节点 path
+     * 当前子节点 path
      */
     private String cpath;
     private List<ACL> acl = ZooDefs.Ids.OPEN_ACL_UNSAFE;
-
+    private final Object lock = new Object();
     /**
      * 思路: 对一个节点及
      */
@@ -64,28 +61,23 @@ public class ZkLock implements Lock {
             System.out.println(watchedEvent.getType());
             if (watchedEvent.getState() == Event.KeeperState.SyncConnected) {
                 System.out.println("链接zk成功");
-            }else if(watchedEvent.getType()== Event.EventType.NodeDeleted){
+            } else if (watchedEvent.getType() == Event.EventType.NodeDeleted) {
                 //监听到了上一个节点的数据 删除了
                 //说明 自己的节点 获得锁
-                System.out.println("节点删除了"+watchedEvent.getPath());
-                synchronized (this){
+                System.out.println("节点删除了" + watchedEvent.getPath());
+                synchronized (this) {
 
                     notifyAll();
-                    try {
-                        zooKeeper.close();
-                        System.out.println("关闭链接"+zooKeeper.getSessionId());
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+
                 }
 
-            }else if(watchedEvent.getState()== Event.KeeperState.Disconnected){
+            } else if (watchedEvent.getState() == Event.KeeperState.Disconnected) {
                 //检测节点数量为几个 如果没有 则删除父节点
 //                System.out.println("关闭");
                 try {
                     List<String> children = zooKeeper.getChildren(lockPath, false);
-                    if(children.size()==0){
-                        zooKeeper.delete(lockPath,-1);
+                    if (children.size() == 0) {
+                        zooKeeper.delete(lockPath, -1);
                     }
                     System.out.println("关闭");
                 } catch (KeeperException | InterruptedException e) {
@@ -104,12 +96,15 @@ public class ZkLock implements Lock {
         Stat stat = null;
         try {
             stat = zooKeeper.exists(lockPath, true);
-            if (stat == null) {
-                //坑位没有占领
-                //创建坑位
-                //如果抛出异常说明
-                String path = zooKeeper.create(lockPath, nodeData, acl, CreateMode.PERSISTENT);
-                System.out.println(path + "创建成功");
+
+            synchronized (lock) {
+                if (stat == null) {
+                    //坑位没有占领
+                    //创建坑位
+                    //如果抛出异常说明
+                    String path = zooKeeper.create(lockPath, nodeData, acl, CreateMode.PERSISTENT);
+                    System.out.println(path + "创建成功");
+                }
             }
             String cNode = lockPath + "/lock_";
             //创建自己的子节点 有序
@@ -118,15 +113,15 @@ public class ZkLock implements Lock {
             // 如果他消失（删除了） 说明该轮到自己去执行了
             List<String> children = zooKeeper.getChildren(lockPath, true);
             Collections.sort(children);
-            int index = children.indexOf(cpath.substring(lockPath.length()+1));
+            int index = children.indexOf(cpath.substring(lockPath.length() + 1));
             if (index == 0) {
                 //说明获得锁了
                 //继续执行
             } else {
                 //监听自己位置的上一位
                 String lastNodePath = children.get(index - 1);
-                zooKeeper.exists(lockPath+"/"+lastNodePath, true);
-                synchronized (watcher){
+                zooKeeper.exists(lockPath + "/" + lastNodePath, true);
+                synchronized (watcher) {
                     //代码暂停执行
                     //等待轮询到自己
                     watcher.wait();
@@ -160,9 +155,15 @@ public class ZkLock implements Lock {
     @Override
     public void unlock() {
         try {
-            zooKeeper.delete(cpath,-1);
-            System.out.println(cpath+"删除数据");
+            zooKeeper.delete(cpath, -1);
+            System.out.println(cpath + "删除数据");
 //
+            try {
+                zooKeeper.close();
+                System.out.println("关闭链接" + zooKeeper.getSessionId());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         } catch (InterruptedException | KeeperException e) {
             e.printStackTrace();
             System.out.println("释放锁失败");
@@ -175,10 +176,10 @@ public class ZkLock implements Lock {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        String path="/lock01";
+        String path = "/lock01";
         for (int i = 0; i < 2; i++) {
-            Thread thread=new Thread(() -> {
-                ZkLock zkLock=new ZkLock("127.0.0.1:2181",path,10000);
+            Thread thread = new Thread(() -> {
+                ZkLock zkLock = new ZkLock("127.0.0.1:2181", path, 10000);
                 System.out.println("上锁");
                 zkLock.lock();
                 try {
