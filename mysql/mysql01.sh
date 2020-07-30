@@ -51,3 +51,13 @@ fi
 alias mysql=/usr/local/mysql/bin/mysql
 #set password for root@10.2.19.6 = password('de2e1ff3efaa532e');
 #update user set password=password('de2e1ff3efaa532e') where user='root' and host='localhost';
+#vi  /etc/sysconfig/iptables
+#-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT
+#service  iptables restart
+
+
+#mysql 数据库 默认 只能locahost链接 需要修改一下配置
+#mysql -u root -p
+# use mysql;
+#update user set host='%' where user='root';
+# flush privileges;
