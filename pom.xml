@@ -12,6 +12,7 @@
         <module>zookeeper</module>
         <module>springsecurityoauth</module>
         <module>springshiro</module>
+        <module>springboot-shiro</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

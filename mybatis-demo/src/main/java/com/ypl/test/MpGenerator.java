@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class MpGenerator {
 
-    final static String  dirPath = "C:\\dev-work\\duubodemo\\mybatis-demo\\src\\main\\java";
+    final static String  dirPath = "C:\\dev-work\\duubodemo\\springboot-shiro\\src\\main\\java";
 
     /**
      * <p>
@@ -100,7 +100,7 @@ public class MpGenerator {
         // 包配置
         PackageConfig pc = new PackageConfig();
         pc.setParent("com.ypl");
-        pc.setModuleName("test");
+//        pc.setModuleName("test");
         pc.setController("controller");
         pc.setEntity("entity");
         pc.setMapper("mapper");
