@@ -13,6 +13,8 @@
         <module>springsecurityoauth</module>
         <module>springshiro</module>
         <module>springboot-shiro</module>
+        <module>Juc</module>
+        <module>tomcat</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
